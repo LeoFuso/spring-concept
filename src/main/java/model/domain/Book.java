@@ -17,7 +17,7 @@ public class Book extends Persisted {
      * @see model.domain.Author#books
      */
     @ManyToMany(mappedBy = "books")
-    private Set<Author> authors;
+    private Set<Author> authorSet;
 
 
 }
