@@ -32,6 +32,9 @@ tmp/
 node_modules/
 jaxws/jaxws-client/src/main/
 
+# Document directory #
+docs/
+
 # OS Files #
 .DS_Store
 
