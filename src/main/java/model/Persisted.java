@@ -13,6 +13,14 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * <p>Created by <a href="https://github.com/LeoFuso">Leonardo Fuso</a> on <i>25/05/2018</i></p>
+ *
+ * <p>
+ * This class is intended to provide a base implementation for any other entity that will be persisted in the
+ * database, centralizing all the database logic in only one place.
+ * </p>
+ */
 @Entity
 @Getter(AccessLevel.PROTECTED)
 @Setter(AccessLevel.PROTECTED)
