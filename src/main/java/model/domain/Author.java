@@ -19,7 +19,7 @@ public class Author extends Persisted {
 
     /**
      * Hibernate does not have a good implementation of the DELETE operation
-     * for the <code>ArrayList</code> class, the implementation for the HashSet class
+     * for the <code>ArrayList</code> class, the implementation for the <code>HashSet</code> class
      * is much more efficient.
      *
      * @see <a href="https://vladmihalcea.com/the-best-way-to-use-the-manytomany-annotation-with-jpa-and-hibernate/"> A blog post demonstrating this </a>
