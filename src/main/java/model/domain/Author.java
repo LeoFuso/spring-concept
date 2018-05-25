@@ -26,17 +26,17 @@ public class Author extends Persisted {
      */
     @JoinTable
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<Book> books;
+    private Set<Book> bookSet;
 
     public Author() {
-        this.books = new HashSet<>();
+        this.bookSet = new HashSet<>();
     }
 
     public Author(String firstName, String lastName, String email) throws AddressException {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = new InternetAddress(email);
-        this.books = new HashSet<>();
+        this.bookSet = new HashSet<>();
     }
 
 }
