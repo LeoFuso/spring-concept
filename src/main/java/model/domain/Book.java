@@ -14,10 +14,9 @@ public class Book extends Persisted {
     private String isbn;
 
     /**
-     * @see model.domain.Author#books
+     * @see model.domain.Author#bookSet
      */
     @ManyToMany(mappedBy = "books")
     private Set<Author> authorSet;
-
 
 }
