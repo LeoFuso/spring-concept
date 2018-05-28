@@ -1,6 +1,7 @@
 package model.address;
 
 import lombok.Data;
+import lombok.NonNull;
 import model.Persisted;
 
 import javax.mail.internet.AddressException;
@@ -11,6 +12,10 @@ import javax.persistence.Entity;
 @Entity
 public class VirtualAddress extends Persisted implements Address {
 
+    /**
+     *
+     */
+    @NonNull
     private InternetAddress internetAddress;
 
     /**

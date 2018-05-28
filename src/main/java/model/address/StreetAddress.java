@@ -1,6 +1,7 @@
 package model.address;
 
 import lombok.Data;
+import lombok.NonNull;
 import model.Persisted;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -16,29 +17,34 @@ import javax.persistence.Entity;
 public class StreetAddress extends Persisted implements Address {
 
     /**
-     * Representing the number value of a Street Address
+     * <p>Representing the number value of a Street Address</p>
      */
+    @NonNull
     private Integer number;
 
     /**
-     * The actual Street Name
+     * <p>The actual Street Name</p>
      */
+    @NonNull
     private String name;
 
     /**
-     * City name, not abbreviated
+     * <p>City name, not abbreviated</p>
      */
+    @NonNull
     private String city;
 
     /**
-     * State name abbreviation
+     * <p>State name abbreviation</p>
      */
+    @NonNull
     private String state;
 
     /**
      * <p>This represents the postal code used by the country where this address is supposed to exist, and will probably be used by the validation method.</p>
      * <p>Even though most countries have their own way of validating a postal code, they do have one, anyway.</p>
      */
+    @NonNull
     private String postalServiceCode;
 
     /**
