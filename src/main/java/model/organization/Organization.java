@@ -21,7 +21,7 @@ import java.util.Set;
 @Setter(AccessLevel.PROTECTED)
 @ToString
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Organization extends Persisted {
+public abstract class Organization extends Persisted {
 
     private String primaryName;
     private String secondaryName;
