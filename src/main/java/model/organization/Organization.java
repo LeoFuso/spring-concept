@@ -1,4 +1,4 @@
-package model.entity;
+package model.organization;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * <p>Created by <a href="https://github.com/LeoFuso">Leonardo Fuso</a> on <i>25/05/2018</i></p>
- * <p>Represents a grouping of common attributes across multiple organizational scope entity types</p>
+ * <p>Represents a grouping of common attributes across multiple organizational scope organization types</p>
  *
  */
 @Entity
