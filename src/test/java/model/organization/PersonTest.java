@@ -6,21 +6,30 @@ import static org.junit.Assert.*;
 
 public class PersonTest {
 
-    @Test
-    public void testCreatingAPerson(){
+	@Test
+	public void testCreatingAPersonAndNameMethods() {
 
-        String socialName = null;
-        String treatmentPronoun = "Prof. Dr.";
-        String firstName = "Leonardo";
-        String middleName = "Fuso Martins";
-        String lastName = "Nuzzo";
+		Person erick;
+		String erickSocialName = "Erick Ferdinand";
+		String erickTreatmentPronoun = "Prof. Dr.";
+		String erickFirstName = "Erick";
+		String erickMiddleName = "Joshua de Martins";
+		String erickLastName = "Ferdinand";
 
-        Person person = new Person(socialName,treatmentPronoun, firstName, middleName, lastName);
+		erick = new Person(erickSocialName, erickTreatmentPronoun, erickFirstName, erickMiddleName, erickLastName);
 
-        String firstAndLastName = person.getFirstAndLastName();
-        String fullName = person.getFullName();
-        String abreviation = person.getShortName();
-    }
+		String actualFirstAndLastName = erick.getFirstAndLastName();
+		String expectedFirstAndLastName = "Prof. Dr. Erick Ferdinand";
+		assertEquals(expectedFirstAndLastName, actualFirstAndLastName);
 
+		String actualFullName = erick.getFullName();
+		String expectedFullName = "Prof. Dr. Erick Joshua de Martins Ferdinand";
+		assertEquals(expectedFullName, actualFullName);
+
+		String actualShortName = erick.getShortName();
+		String expectedShortName = "Prof. Dr. E. M. Ferdinand";
+		assertEquals(expectedShortName, actualShortName);
+
+	}
 
 }
