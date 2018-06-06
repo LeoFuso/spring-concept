@@ -14,7 +14,6 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 public class Tag extends Persisted {
 
     private String name;
