@@ -2,7 +2,9 @@ package integration.organization;
 
 import integration.DTO;
 import model.organization.Person;
+import org.modelmapper.Condition;
 import org.modelmapper.Converter;
+import org.modelmapper.PropertyMap;
 
 public class OnlyBobPersonNameDTO extends DTO<Person, OnlyBobPersonNameDTO> {
 
@@ -14,24 +16,40 @@ public class OnlyBobPersonNameDTO extends DTO<Person, OnlyBobPersonNameDTO> {
 	}
 
 	@Override
-	public Converter<Person, OnlyBobPersonNameDTO> getConverter() {
+	public PropertyMap<Person, OnlyBobPersonNameDTO> getPropertyMap() {
 
-		return context -> {
+		final String name = "Bob";
 
-			Person person = context.getSource();
-			OnlyBobPersonNameDTO dto = new OnlyBobPersonNameDTO();
+		/*
+		 THIS IS A DISASTER
+		 I HATE MODEL MAPPER
+		 THIS DOES NOT WORK AND I DON'T KNOW WHY
+		 */
+		Condition<Person, OnlyBobPersonNameDTO> isBob = context -> context.getSource().getFirstName().equals(name);
 
-			if (person.getFirstName().equals("Bob")){
-
-				dto.setFullName(person.getFullName());
-				dto.setShortName(person.getShortName());
-				return dto;
-
-			}else{
-				dto.setFullName(null);
-				dto.setShortName(null);
-				return dto;
+		return new PropertyMap<>() {
+			@Override
+			protected void configure() {
+				when(isBob).map().setFullName(source.getFullName());
+				when(isBob).map().setShortName(source.getShortName());
 			}
+		};
+	}
+
+	@Override
+	protected Converter<Person, OnlyBobPersonNameDTO> getConverter() {
+
+		/* THIS DOES NOT WORK EITHER */
+		return context -> {
+			Person source = context.getSource();
+			OnlyBobPersonNameDTO destination = context.getDestination();
+
+			if (source.getFirstName().equals("Bob")) {
+				destination.setFullName(source.getFullName());
+				destination.setShortName(source.getShortName());
+				return destination;
+			} else
+				return null;
 		};
 	}
 
