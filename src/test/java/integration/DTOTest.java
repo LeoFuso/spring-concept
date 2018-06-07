@@ -4,6 +4,8 @@ import integration.organization.OnlyBobPersonNameDTO;
 import integration.organization.PersonNameDTO;
 import model.organization.Person;
 import org.junit.Test;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -88,6 +90,19 @@ public class DTOTest {
 		onlyBobNameDTO = onlyBobNameDTO.convert(erick);
 
 		assertNull(onlyBobNameDTO);
+
+	}
+
+	@Test
+	public void testModelMapper() {
+
+		final ModelMapper modelMapper = new ModelMapper();
+
+		TypeMap<Person, PersonNameDTO> typeMappings;
+		typeMappings = modelMapper.getTypeMap(Person.class, PersonNameDTO.class);
+
+		typeMappings.getMappings().forEach(System.out::println);
+
 
 	}
 
