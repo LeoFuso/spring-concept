@@ -1,8 +1,10 @@
 package integration;
 
+import exception.util.Exceptional;
 import org.apache.commons.lang3.Validate;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
@@ -36,7 +38,7 @@ public abstract class DTO<T, D extends DTO> {
 	@Id
 	private Object id;
 
-	protected static ModelMapper mapper = new ModelMapper();
+	protected static final ModelMapper mapper = new ModelMapper();
 
 	protected DTO() { /* empty */ }
 
@@ -50,27 +52,20 @@ public abstract class DTO<T, D extends DTO> {
 	 */
 	public D convert(T keyEntity) {
 
-		Converter<T, D> converter;
 		D object = DTO.getObjectReference(this.getDataTransferObjectClass());
 
-		try {
-
-			converter = this.getConverter();
-
-			/* this is bad */
-			ModelMapper localModelMapper = new ModelMapper();
-
-			localModelMapper.addConverter(converter);   
-			localModelMapper.map(keyEntity, object);
-			return object;
-
-		} catch (UnsupportedOperationException ignored) { /* empty */}
+		Exceptional<PropertyMap<T, D>> converterExceptional = Exceptional.of(this.getPropertyMap());
+		converterExceptional.ifPresent(mapper::addMappings);
 
 		mapper.map(keyEntity, object);
 		return object;
 	}
 
-	public Converter<T, D> getConverter() {
+	public PropertyMap<T, D> getPropertyMap() {
+		throw new UnsupportedOperationException();
+	}
+
+	protected Converter<T, D> getConverter() {
 		throw new UnsupportedOperationException();
 	}
 
