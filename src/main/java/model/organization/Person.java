@@ -1,7 +1,5 @@
 package model.organization;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.Validate;
 
 import javax.persistence.Entity;
@@ -12,27 +10,21 @@ public class Person extends Organization {
 	/**
 	 * <p>For cases like: Dr, Dra, Mr, etc.</p>
 	 */
-	@Getter
-	@Setter
 	private String treatmentPronoun;
 
 	/**
 	 * <p>Only the first name of a person</p>
 	 */
-	@Getter
 	private String firstName;
 
 	/**
 	 * <p>All the names of a person, except the first and last, separated by a space.</p>
 	 */
-	@Getter
-	@Setter
 	private String middleName;
 
 	/**
 	 * <p>Only the last name of a person</p>
 	 */
-	@Getter
 	private String lastName;
 
 	/**
@@ -132,5 +124,21 @@ public class Person extends Organization {
 				.append(secondPart)
 				.append(thirdPart)
 				.append(lastName).toString();
+	}
+
+	public String getTreatmentPronoun() {
+		return treatmentPronoun;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getMiddleName() {
+		return middleName;
+	}
+
+	public String getLastName() {
+		return lastName;
 	}
 }

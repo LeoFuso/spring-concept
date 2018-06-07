@@ -1,7 +1,5 @@
 package model.address;
 
-import lombok.Data;
-import lombok.NonNull;
 import model.Persisted;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -22,34 +20,30 @@ import javax.persistence.Entity;
  * from country to country.
  * </i></p>
  */
-@Data
 @Entity
 public class PhoneAddress extends Persisted implements Address {
-    /**
-     * <p>As defined in the Telephone numbering plan, this attribute represents the first part of a well-formed telephone number.</p>
-     * <p>In this case, the code of the country where the number exists.</p>
-     */
-    @NonNull
-    private String countryCode;
+	/**
+	 * <p>As defined in the Telephone numbering plan, this attribute represents the first part of a well-formed telephone number.</p>
+	 * <p>In this case, the code of the country where the number exists.</p>
+	 */
+	private String countryCode;
 
-    /**
-     * <p>As defined in the Telephone numbering plan, this attribute represents the second part of a well-formed telephone number.</p>
-     * <p>In this case, the code of the area inside a country where the number exists.</p>
-     */
-    @NonNull
-    private String areaCode;
+	/**
+	 * <p>As defined in the Telephone numbering plan, this attribute represents the second part of a well-formed telephone number.</p>
+	 * <p>In this case, the code of the area inside a country where the number exists.</p>
+	 */
+	private String areaCode;
 
-    /**
-     * <p>As defined in the Telephone numbering plan, this attribute represents the third part of a well-formed telephone number.</p>
-     * <p>
-     * The actual device number that the object of this class will refer to.
-     * </p>
-     */
-    @NonNull
-    private String number;
+	/**
+	 * <p>As defined in the Telephone numbering plan, this attribute represents the third part of a well-formed telephone number.</p>
+	 * <p>
+	 * The actual device number that the object of this class will refer to.
+	 * </p>
+	 */
+	private String number;
 
-    @Override
-    public boolean validate() {
-        throw new NotImplementedException("Not implemented yet");
-    }
+	@Override
+	public boolean validate() {
+		throw new NotImplementedException("Not implemented yet");
+	}
 }

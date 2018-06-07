@@ -1,9 +1,5 @@
 package model.organization;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import model.Persisted;
 import model.address.Address;
 
@@ -16,16 +12,12 @@ import java.util.Set;
  * <p>Represents a grouping of common attributes across multiple organizational scope organization types</p>
  */
 @Entity
-@Getter(AccessLevel.PROTECTED)
-@Setter(AccessLevel.PROTECTED)
-@ToString
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Organization extends Persisted {
 
 	private String primaryName;
 	private String secondaryName;
 
-	@Setter(AccessLevel.PRIVATE)
 	@JoinTable
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Address> addressSet;
