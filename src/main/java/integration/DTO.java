@@ -38,7 +38,7 @@ public abstract class DTO<T, D extends DTO> {
 	@Id
 	private Object id;
 
-	protected static final ModelMapper mapper = new ModelMapper();
+	private static final ModelMapper mapper = new ModelMapper();
 
 	protected DTO() { /* empty */ }
 
@@ -52,12 +52,16 @@ public abstract class DTO<T, D extends DTO> {
 	 */
 	public D convert(T keyEntity) {
 
-		D object = DTO.getObjectReference(this.getDataTransferObjectClass());
+		Class<D> classReference = this.getDataTransferObjectClass();
 
-		Exceptional<PropertyMap<T, D>> converterExceptional = Exceptional.of(this.getPropertyMap());
-		converterExceptional.ifPresent(mapper::addMappings);
+		D object = DTO.getObjectReference(classReference);
+
+		Exceptional<PropertyMap<T, D>> propertyMapExceptional = Exceptional.of(this.getPropertyMap());
+
+		propertyMapExceptional.ifPresent(mapper::addMappings);
 
 		mapper.map(keyEntity, object);
+
 		return object;
 	}
 
