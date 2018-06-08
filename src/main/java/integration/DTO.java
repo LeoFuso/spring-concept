@@ -1,6 +1,6 @@
 package integration;
 
-import exception.util.Exceptional;
+import com.annimon.stream.Exceptional;
 import org.apache.commons.lang3.Validate;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -9,10 +9,7 @@ import org.modelmapper.PropertyMap;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -56,9 +53,10 @@ public abstract class DTO<T, D extends DTO> {
 
 		D object = DTO.getObjectReference(classReference);
 
-		Exceptional<PropertyMap<T, D>> propertyMapExceptional = Exceptional.of(this.getPropertyMap());
+		Exceptional.of(this::getPropertyMap)
+				.ifPresent(mapper::addMappings);
 
-		propertyMapExceptional.ifPresent(mapper::addMappings);
+		Exceptional.of(this::getPropertyMap).ifException(System.out::println);
 
 		mapper.map(keyEntity, object);
 

@@ -3,6 +3,7 @@ package exception.util;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -158,5 +159,23 @@ public class ExceptionalTest {
 		Exceptional<String> value = Exceptional.of("Value");
 		value.rethrowRuntime();
 
+	}
+
+	@Test
+	public void aBunch(){
+
+		/* Null String */
+		String nullable = null;
+
+		boolean isPresent = util.Exceptional.of(exceptionThrower())
+				.isPresent();
+
+		assertFalse(isPresent);
+
+	}
+
+
+	private String exceptionThrower(){
+		throw new NullPointerException();
 	}
 }
