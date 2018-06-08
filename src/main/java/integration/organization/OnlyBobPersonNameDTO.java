@@ -24,8 +24,11 @@ public class OnlyBobPersonNameDTO extends DTO<Person, OnlyBobPersonNameDTO> {
 		 THIS IS A DISASTER
 		 I HATE MODEL MAPPER
 		 THIS DOES NOT WORK AND I DON'T KNOW WHY
+		 I'M VERY SAD RN
 		 */
-		Condition<Person, OnlyBobPersonNameDTO> isBob = context -> context.getSource().getFirstName().equals(name);
+
+		//Condition<Person, OnlyBobPersonNameDTO> isBob = context -> context.getSource().getFirstName().equals(name);
+		Condition<?, ?> isBob = (Condition<Person, OnlyBobPersonNameDTO>) context -> context.getSource().getFirstName().equals(name);
 
 		return new PropertyMap<>() {
 			@Override
