@@ -106,6 +106,21 @@ public class Exceptional<T> {
 	}
 
 	/**
+	 * Returns an {@code Exceptional} with value provided by given {@code ExceptionSupplier} function.
+	 *
+	 * @param <T>      the type of value
+	 * @param supplier a supplier function
+	 * @return an {@code Exceptional}
+	 */
+	public static <T> Exceptional<T> of(ExceptionSupplier<T, Exception> supplier) {
+		try {
+			return of(supplier.get());
+		} catch (Exception exception) {
+			return of(exception);
+		}
+	}
+
+	/**
 	 * Returns an {@link Exceptional} describing the given non-{@code null}
 	 * exception.
 	 *
@@ -154,7 +169,7 @@ public class Exceptional<T> {
 	 * @return the non-{@code null} value described by this {@link Exceptional}
 	 * @throws NoSuchElementException if no value is present
 	 * @throws RuntimeException       if an exception is present
-	 * @apiNote The preferred alternative to this method is {@link #orElseThrow()}.
+	 * @apiNote The preferred alternative to this method is {@link #orElse(Object)}.
 	 */
 	public T get() {
 		if (exception != null)
@@ -163,6 +178,18 @@ public class Exceptional<T> {
 		if (value == null)
 			throw new NoSuchElementException("No value present");
 		return value;
+	}
+
+	/**
+	 * If no exception is present, returns the value, otherwise returns
+	 * {@code other}.
+	 *
+	 * @param other the value to be returned, if no value is present.
+	 *              May be {@code null}.
+	 * @return the value, if no exception is present, otherwise {@code other}
+	 */
+	public T orElse(T other) {
+		return exception == null ? value : other;
 	}
 
 	/**
@@ -202,13 +229,14 @@ public class Exceptional<T> {
 	 * otherwise does nothing.
 	 *
 	 * @param action the action to be performed, if a value is present and no exception was thrown
+	 * @return TODO: This
 	 * @throws NullPointerException if value is present and the given action is
 	 *                              {@code null}
 	 */
-	public void ifPresent(Consumer<? super T> action) {
+	public Exceptional<T> ifPresent(Consumer<? super T> action) {
 		if (exception == null && value != null)
 			action.accept(value);
-
+		return this;
 	}
 
 	/**
@@ -246,20 +274,16 @@ public class Exceptional<T> {
 			throw exception;
 	}
 
-	public void ifExceptionPresent(Consumer<? super Exception> action) {
+	public void ifException(Consumer<? super Exception> action) {
 		if (exception != null)
 			action.accept(exception);
 	}
 
-	public void ifExceptionPresent(Class<? extends Exception> targetType,
-	                               Consumer<? super Exception> consumer) {
+	public void ifException(Class<? extends Exception> targetType,
+	                        Consumer<? super Exception> consumer) {
 
 		if (exception != null && targetType.isAssignableFrom(exception.getClass()))
 			consumer.accept(exception);
-	}
-
-	public T orElse(T other) {
-		return exception == null ? value : other;
 	}
 
 	@Override

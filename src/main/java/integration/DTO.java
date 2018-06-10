@@ -1,6 +1,6 @@
 package integration;
 
-import com.annimon.stream.Exceptional;
+import exception.util.Exceptional;
 import org.apache.commons.lang3.Validate;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
