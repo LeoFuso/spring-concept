@@ -101,23 +101,8 @@ public class Exceptional<T> {
 	 * @return an {@link Exceptional} with the value present
 	 * @throws NullPointerException if value is {@code null}
 	 */
-	public static <T> Exceptional<T> of(T value) {
+	private static <T> Exceptional<T> of(T value) {
 		return new Exceptional<>(value);
-	}
-
-	/**
-	 * Returns an {@code Exceptional} with value provided by given {@code ExceptionSupplier} function.
-	 *
-	 * @param <T>      the type of value
-	 * @param supplier a supplier function
-	 * @return an {@code Exceptional}
-	 */
-	public static <T> Exceptional<T> of(ExceptionSupplier<T, Exception> supplier) {
-		try {
-			return of(supplier.get());
-		} catch (Exception exception) {
-			return of(exception);
-		}
 	}
 
 	/**
@@ -129,8 +114,28 @@ public class Exceptional<T> {
 	 * @return an {@link Exceptional} with the exception present
 	 * @throws NullPointerException if value is {@code null}
 	 */
-	public static <T> Exceptional<T> of(Exception exception) {
+	private static <T> Exceptional<T> of(Exception exception) {
 		return new Exceptional<>(exception);
+	}
+
+	/**
+	 * Returns an {@link Exceptional} with value provided by given {@link ExceptionSupplier}.
+	 * It encapsulates the methods {@link #of(Object)} and {@link #of(Exception)}
+	 *
+	 * @param <T>      the type of value
+	 * @param supplier a supplier function
+	 * @return an {@link Exceptional} with the value provided,
+	 * if not {@code null}, or an {@link Exceptional} with an {@link Exception} thrown
+	 * @throws NullPointerException if value is {@code null}
+	 * @see #of(Object)
+	 * @see #of(Exception)
+	 */
+	public static <T> Exceptional<T> of(ExceptionSupplier<T, Exception> supplier) {
+		try {
+			return of(supplier.get());
+		} catch (Exception exception) {
+			return of(exception);
+		}
 	}
 
 	/**
@@ -143,7 +148,7 @@ public class Exceptional<T> {
 	 * is non-{@code null} and no {@link Exception} is thrown, otherwise an
 	 * {@link Exceptional} with a present exception or an empty {@link Exceptional}
 	 */
-	public static <T> Exceptional<T> ofNullable(T value) {
+	private static <T> Exceptional<T> ofNullable(T value) {
 		return value == null ? empty() : of(value);
 	}
 
@@ -156,8 +161,22 @@ public class Exceptional<T> {
 	 * @return an {@link Exceptional} with the exception present
 	 * @throws NullPointerException if value is {@code null}
 	 */
-	public static <T> Exceptional<T> ofNullable(Exception exception) {
+	@Deprecated
+	private static <T> Exceptional<T> ofNullable(Exception exception) {
 		return of(exception);
+	}
+
+	/**
+	 * @param supplier
+	 * @param <T>
+	 * @return
+	 */
+	public static <T> Exceptional<T> ofNullable(ExceptionSupplier<T, Exception> supplier) {
+		try {
+			return ofNullable(supplier.get());
+		} catch (Exception exception) {
+			return of(exception);
+		}
 	}
 
 	/**
