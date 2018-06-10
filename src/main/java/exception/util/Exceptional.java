@@ -4,12 +4,11 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
- * <p>
  * A container object inspired in {@link java.util.Optional} to handle exceptions, in which may or may not contain a
  * non-{@code null} value or a non-{@code null} {@link Exception} thrown.
- * </p>
  *
  * <p>
  * If a value is present, {@link #isPresent()} returns {@code true}. If no
@@ -19,10 +18,80 @@ import java.util.function.Consumer;
  * returns {@code false}.
  * </p>
  *
+ * <pre>
+ *      <code>
+ *
+ *      Object value = Exceptional.of(() -&gt Class.methodReference).filterValue();
+ *
+ *      Exceptional.of(Class::methodReference).ifPresent(System.out::println);
+ *
+ *      Exceptional.of(() -&gt; IOUtils.readBytes(inputStream)).getOrElse(new byte[0]);
+ *
+ *      Exceptional&lt;String&gt; exceptionalString = Exceptional.of(() -&gt Class.methodReference);
+ *
+ *      </code>
+ * </pre>
+ *
  * @param <T> reference type of value
- * @see <a href="https://dzone.com/articles/exceptional-optional"> inspired by </a>
+ * @apiNote {@link Exceptional} is intended to consume only method references,
+ * to capture its {@link Exception} thrown; {@link Exceptional} is not intended
+ * for handling {@code null} outputs, this is a {@link java.util.Optional}
+ * usage. This is not a substitute of {@link java.util.Optional}, but has the
+ * ability to handle {@code null} outputs of any method return. A variable whose
+ * type is {@link Exceptional} should never itself be {@code null}; it should
+ * always point to an {@link Exceptional} instance.
+ * @since 1.8
  */
 public class Exceptional<T> {
+
+	/**
+	 * Returns an {@link Exceptional} describing the given non-{@code null}
+	 * value or an {@link Exceptional}  describing an {@link Exception} thrown.
+	 *
+	 * @param <T>      the type of value
+	 * @param supplier a supplier function
+	 * @return an {@link Exceptional} describing the given non-{@code null}
+	 * value or an {@link Exceptional}  describing an {@link Exception} thrown.
+	 * @apiNote The value must always be provided by an {@link ExceptionSupplier},
+	 * in another words, the value must always come from a method reference. If the
+	 * value provided is {@code null} an {@link Exceptional}  describing a
+	 * {@link NullPointerException} is returned instead of a {@link NullPointerException} throws.
+	 */
+	public static <T> Exceptional<T> of(ExceptionSupplier<T, Exception> supplier) {
+		Objects.requireNonNull(supplier);
+
+		try {
+			return of(supplier.get());
+		} catch (Exception exception) {
+			return of(exception);
+		}
+	}
+
+	/**
+	 * Returns an {@link Exceptional} describing the given value, if
+	 * non-{@code null}, otherwise returns an empty {@link Exceptional};
+	 * can also returns an {@link Exceptional} describing a {@link Exception}
+	 * thrown. Can also returns empty {@link Exceptional} if the supplier
+	 * function is {@code null}.
+	 *
+	 * @param supplier a supplier function
+	 * @param <T>      the type of value
+	 * @return Returns an {@link Exceptional} describing the given value, if
+	 * non-{@code null}, otherwise returns an empty {@link Exceptional};
+	 * can also returns an {@link Exceptional} describing a {@link Exception}
+	 * thrown. Can also returns empty {@link Exceptional} if the supplier
+	 * function is {@code null}.
+	 * @apiNote The value must always be provided by an {@link ExceptionSupplier},
+	 * in another words, the value must always come from a method reference.
+	 */
+	public static <T> Exceptional<T> ofNullable(ExceptionSupplier<T, Exception> supplier) {
+		if (supplier == null) return empty();
+		try {
+			return ofNullable(supplier.get());
+		} catch (Exception exception) {
+			return of(exception);
+		}
+	}
 
 	/**
 	 * Common instance of {@code empty()}.
@@ -61,7 +130,7 @@ public class Exceptional<T> {
 	 * @return an empty {@link Exceptional}
 	 * @apiNote Though it may be tempting to do so, avoid testing if an object is empty
 	 * by comparing with {@code ==} against instances returned by
-	 * {@link #empty()}.  There is no guarantee that it is a singleton.
+	 * {@code empty()}.  There is no guarantee that it is a singleton.
 	 * Instead, use {@link #isPresent()}.
 	 */
 	private static <T> Exceptional<T> empty() {
@@ -100,6 +169,7 @@ public class Exceptional<T> {
 	 * @param <T>   the type of the value
 	 * @return an {@link Exceptional} with the value present
 	 * @throws NullPointerException if value is {@code null}
+	 * @apiNote This method isn't defined to be used directly
 	 */
 	private static <T> Exceptional<T> of(T value) {
 		return new Exceptional<>(value);
@@ -113,29 +183,10 @@ public class Exceptional<T> {
 	 * @param <T>       the type of the value
 	 * @return an {@link Exceptional} with the exception present
 	 * @throws NullPointerException if value is {@code null}
+	 * @apiNote This method isn't defined to be used directly
 	 */
 	private static <T> Exceptional<T> of(Exception exception) {
 		return new Exceptional<>(exception);
-	}
-
-	/**
-	 * Returns an {@link Exceptional} with value provided by given {@link ExceptionSupplier}.
-	 * It encapsulates the methods {@link #of(Object)} and {@link #of(Exception)}
-	 *
-	 * @param <T>      the type of value
-	 * @param supplier a supplier function
-	 * @return an {@link Exceptional} with the value provided,
-	 * if not {@code null}, or an {@link Exceptional} with an {@link Exception} thrown
-	 * @throws NullPointerException if value is {@code null}
-	 * @see #of(Object)
-	 * @see #of(Exception)
-	 */
-	public static <T> Exceptional<T> of(ExceptionSupplier<T, Exception> supplier) {
-		try {
-			return of(supplier.get());
-		} catch (Exception exception) {
-			return of(exception);
-		}
 	}
 
 	/**
@@ -147,6 +198,7 @@ public class Exceptional<T> {
 	 * @return an {@link Exceptional} with a present value if the specified value
 	 * is non-{@code null} and no {@link Exception} is thrown, otherwise an
 	 * {@link Exceptional} with a present exception or an empty {@link Exceptional}
+	 * @apiNote This method isn't defined to be used directly
 	 */
 	private static <T> Exceptional<T> ofNullable(T value) {
 		return value == null ? empty() : of(value);
@@ -161,22 +213,9 @@ public class Exceptional<T> {
 	 * @return an {@link Exceptional} with the exception present
 	 * @throws NullPointerException if value is {@code null}
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	private static <T> Exceptional<T> ofNullable(Exception exception) {
 		return of(exception);
-	}
-
-	/**
-	 * @param supplier
-	 * @param <T>
-	 * @return
-	 */
-	public static <T> Exceptional<T> ofNullable(ExceptionSupplier<T, Exception> supplier) {
-		try {
-			return ofNullable(supplier.get());
-		} catch (Exception exception) {
-			return of(exception);
-		}
 	}
 
 	/**
@@ -191,24 +230,72 @@ public class Exceptional<T> {
 	 * @apiNote The preferred alternative to this method is {@link #orElse(Object)}.
 	 */
 	public T get() {
-		if (exception != null)
+		if (exception != null) {
 			throw new RuntimeException(exception);
-
-		if (value == null)
+		}
+		if (value == null) {
 			throw new NoSuchElementException("No value present");
+		}
 		return value;
 	}
 
 	/**
-	 * If no exception is present, returns the value, otherwise returns
+	 * If no exception is present and if the value is non-{@code null}, returns the value, otherwise returns
 	 * {@code other}.
 	 *
 	 * @param other the value to be returned, if no value is present.
 	 *              May be {@code null}.
-	 * @return the value, if no exception is present, otherwise {@code other}
+	 * @return If no exception is present and if the value is non-{@code null}, returns the value, otherwise returns
+	 * {@code other}.
 	 */
 	public T orElse(T other) {
-		return exception == null ? value : other;
+		return value != null ? value : other;
+	}
+
+	/**
+	 * If no exception is present and if the value is non-{@code null},
+	 * returns the value, otherwise the result produced by the supplying function
+	 *
+	 * @param supplier the supplying function that produces a value to be returned, can't be {@code null}.
+	 * @return If no exception is present and if the value is non-{@code null},
+	 * returns the value, otherwise the result produced by the supplying function
+	 * @throws NullPointerException if no value is present and the supplying
+	 *                              function is {@code null}
+	 */
+	public T orElse(Supplier<? extends T> supplier) {
+		return value != null ? value : supplier.get();
+	}
+
+	/**
+	 * If an {@link Exception} is thrown or the {@code value} is {@code null}, performs the given
+	 * {@code action} on {@code object} passed as parameter, otherwise does nothing.
+	 *
+	 * @param object target of a given {@code action} to be performed
+	 * @param action the {@code action} to be performed on {@code object}, if no {@code value} is present
+	 *               and an {@link Exception} is thrown
+	 * @param <O>    type of {@code object} passed as parameter
+	 * @throws NullPointerException if given {@code action} or {@code object} is {@code null}
+	 */
+	public <O> void orElseDo(O object, Consumer<O> action) {
+		if (value == null) {
+			action.accept(object);
+		}
+	}
+
+	/**
+	 * Will return the {@code value}, whether it is {@code null} or not
+	 * @return {@link #value}
+	 */
+	public T filterValue() {
+		return value;
+	}
+
+	/**
+	 * Will return the {@code exception}, whether it is {@code null} or not
+	 * @return {@link #exception}
+	 */
+	public Exception filterException() {
+		return exception;
 	}
 
 	/**
@@ -239,7 +326,7 @@ public class Exceptional<T> {
 	 * @return {@code true} if an exception is present, otherwise {@code false}
 	 */
 	public boolean isExceptionPresent() {
-		return exception == null;
+		return exception != null;
 	}
 
 
@@ -283,14 +370,24 @@ public class Exceptional<T> {
 		 */
 	}
 
-	public void rethrowRuntime() {
-		if (exception != null)
-			throw new RuntimeException(exception);
+	/**
+	 * If an {@link Exception} is present, will rethrow it as a {@link RuntimeException}
+	 * @throws RuntimeException if an {@link Exception} is present
+	 */
+	public void rethrowRunTime() {
+		if (exception != null) {
+			throw (RuntimeException) exception;
+		}
 	}
 
+	/**
+	 * If an {@link Exception} is present, will rethrow it as an {@link Exception}
+	 * @throws Exception if an {@link Exception} is present
+	 */
 	public void rethrow() throws Exception {
-		if (exception != null)
+		if (exception != null) {
 			throw exception;
+		}
 	}
 
 	public void ifException(Consumer<? super Exception> action) {
