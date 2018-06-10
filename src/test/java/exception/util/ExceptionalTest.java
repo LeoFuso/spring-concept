@@ -3,7 +3,6 @@ package exception.util;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -15,9 +14,11 @@ public class ExceptionalTest {
 	@Test
 	public void testSimpleValuePresent() {
 
-		Exceptional<String> value = Exceptional.of("Value");
-		assertTrue(value.isPresent());
-		assertEquals("Value", value.get());
+		Exceptional<String> exceptional = Exceptional.of(this::getValue);
+
+		assertTrue(exceptional.isPresent());
+		assertEquals("Value", exceptional.get());
+		assertEquals("Value", exceptional.filterValue());
 
 	}
 
@@ -27,22 +28,22 @@ public class ExceptionalTest {
 	@Test
 	public void testIfPresentWithValue() {
 
-		Exceptional<String> value = Exceptional.of("Value");
+		Exceptional<String> exceptional = Exceptional.of(this::getValue);
 
 		StringBuilder result = new StringBuilder();
-		value.ifPresent(val -> result.append(val));
-
+		exceptional.ifPresent(val -> result.append(val));
 		assertEquals("Value", result.toString());
 	}
 
+	@Test
 	public void testIfPresentWithoutValue() {
 
-		Exceptional<String> value = Exceptional.of(new IllegalArgumentException("12345"));
+		Exceptional<String> exceptional = Exceptional.of(this::exceptionThrower);
 
 		StringBuilder result = new StringBuilder();
-		value.ifPresent(result::append);
-
+		exceptional.ifPresent(result::append);
 		assertEquals("", result.toString());
+
 	}
 
 	/**
@@ -50,132 +51,173 @@ public class ExceptionalTest {
 	 */
 	@Test(expected = RuntimeException.class)
 	public void testExceptionIsPresent() {
-		Exceptional<String> value = Exceptional.of(new IllegalArgumentException("12345"));
-		assertFalse(value.isPresent());
-		value.get();
-	}
 
+		Exceptional<String> exceptional = Exceptional.of(this::exceptionThrower);
+		assertFalse(exceptional.isPresent());
+		exceptional.get();
+
+	}
 
 	@Test
 	public void testIfAnyExceptionIsPresent() {
-		Exceptional<String> value = Exceptional.of(new IllegalArgumentException("12345"));
-		StringBuilder result = new StringBuilder();
-		value.ifExceptionPresent(ex -> result.append(ex.getMessage()));
-		assertEquals("12345", result.toString());
-	}
 
+		Exceptional<String> exceptional = Exceptional.of(this::exceptionThrower);
+
+		StringBuilder result = new StringBuilder();
+		exceptional.ifException(ex -> result.append(ex.getMessage()));
+		assertEquals("message", result.toString());
+
+	}
 
 	@Test
 	public void testIfOneTypeOfExceptionIsNotPresent() {
 
-		Exceptional<String> value = Exceptional.of(new IllegalArgumentException("12345"));
+		Exceptional<String> exceptional = Exceptional.of(this::runtimeExceptionThrower);
 
 		StringBuilder result = new StringBuilder();
-		value.ifExceptionPresent(IOException.class, ex -> result.append(
+
+		exceptional.ifException(IOException.class, ex -> result.append(
 				ex.getMessage()));
 
 		assertEquals("", result.toString());
-	}
 
+	}
 
 	@Test
 	public void testIfOneTypeOfExceptionIsPresent() {
 
-		Exceptional<String> value = Exceptional.of(new IOException("12345"));
+		Exceptional<String> exceptional = Exceptional.of(this::runtimeExceptionThrower);
 
 		StringBuilder result = new StringBuilder();
 
-		value.ifExceptionPresent(IOException.class, ex -> result.append(
-				ex.getMessage()));
+		exceptional.ifException(RuntimeException.class, ex -> result.append(
+				ex.getMessage()
+		));
 
-		assertEquals("12345", result.toString());
+		assertEquals("message", result.toString());
 	}
 
 
 	@Test
 	public void testIfExceptionIsNotPresent() {
 
-		Exceptional<String> value = Exceptional.of("Value");
+		Exceptional<String> exceptional = Exceptional.of(this::getValue);
 
 		StringBuilder result = new StringBuilder();
 
-		value.ifExceptionPresent(ex -> result.append(ex.getMessage()));
+		exceptional.ifException(ex -> result.append(ex.getMessage()));
 
 		assertEquals("", result.toString());
 	}
 
 	/**
-	 * Now, if you don't care what happened you can just use orElse to return a default value.
+	 * Now, if you don't care what happened you can just use orElseDo to return a default value.
 	 */
 	@Test
 	public void testOrElseValue() {
 
-		Exceptional<String> value = Exceptional.of("Value");
+		Exceptional<String> exceptional = Exceptional.of(this::getValue);
 
-		assertEquals("Value", value.orElse("Alternative Value"));
+		assertEquals("Value", exceptional.orElse("Alternative Value"));
 	}
 
 	@Test
 	public void testOrElseAlternativeValue() {
 
-		Exceptional<String> value = Exceptional.of(new IllegalArgumentException("12345"));
+		Exceptional<String> exceptional = Exceptional.of(this::exceptionThrower);
 
-		assertEquals("Alternative Value", value.orElse("Alternative Value"));
+		assertEquals("Alternative Value", exceptional.orElse("Alternative Value"));
 	}
 
 	/**
 	 * Finally it has the ability to rethrow the exception if necessary.
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = InstantiationException.class)
 	public void testRethrow() throws Exception {
 
-		Exceptional<String> value = Exceptional.of(new IllegalArgumentException("12345"));
+		Exceptional<String> exceptional = Exceptional.of(this::exceptionThrower);
+		exceptional.rethrow();
 
-		value.rethrow();
 	}
 
 
 	@Test
 	public void testRethrowWithoutException() throws Exception {
 
-		Exceptional<String> value = Exceptional.of("Value");
+		Exceptional<String> exceptional = Exceptional.of(this::getValue);
+		exceptional.rethrow();
 
-		value.rethrow();
 	}
 
 
 	@Test(expected = RuntimeException.class)
-	public void testRethrowRuntime() throws Exception {
+	public void testRethrowRuntime() {
 
-		Exceptional<String> value = Exceptional.of(new IllegalArgumentException("12345"));
+		Exceptional<String> exceptional = Exceptional.of(this::runtimeExceptionThrower);
+		exceptional.rethrowRunTime();
 
-		value.rethrowRuntime();
 	}
 
 
 	@Test
-	public void testRethrowRuntimeWithoutException() throws Exception {
+	public void testRethrowRuntimeWithoutException() {
 
-		Exceptional<String> value = Exceptional.of("Value");
-		value.rethrowRuntime();
+		Exceptional<String> exceptional = Exceptional.of(this::getValue);
+		exceptional.rethrowRunTime();
+
+	}
+
+	/*
+	 * You can have null return types too
+	 */
+	@Test(expected = NullPointerException.class)
+	public void missingNullableInterface() {
+
+		Exceptional<String> exceptional = Exceptional.of(this::getNullValue);
+		exceptional.rethrowRunTime();
 
 	}
 
 	@Test
-	public void aBunch(){
+	public void usingNullableInterface() {
+		Exceptional<String> exceptional = Exceptional.ofNullable(this::getNullValue);
 
-		/* Null String */
-		String nullable = null;
-
-		boolean isPresent = util.Exceptional.of(exceptionThrower())
-				.isPresent();
-
-		assertFalse(isPresent);
-
+		assertFalse(exceptional.isExceptionPresent());
+		assertFalse(exceptional.isPresent());
+		exceptional.rethrowRunTime();
 	}
 
+	/*
+	 * If you want to perform an action after
+	 */
+	@Test
+	public void nullableOrElseDo() {
 
-	private String exceptionThrower(){
-		throw new NullPointerException();
+		Exceptional<String> exceptional = Exceptional.ofNullable(this::getNullValue);
+
+		StringBuilder result = new StringBuilder();
+
+		exceptional
+				.ifPresent(result::append)
+				.orElseDo(result, res -> res.append("Value"));
+
+		assertEquals("Value", result.toString());
 	}
+
+	private String exceptionThrower() throws Exception {
+		throw new InstantiationException("message");
+	}
+
+	private String runtimeExceptionThrower() {
+		throw new RuntimeException("message");
+	}
+
+	private String getNullValue() {
+		return null;
+	}
+
+	private String getValue() {
+		return "Value";
+	}
+
 }
