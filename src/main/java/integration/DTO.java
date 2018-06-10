@@ -56,8 +56,6 @@ public abstract class DTO<T, D extends DTO> {
 		Exceptional.of(this::getPropertyMap)
 				.ifPresent(mapper::addMappings);
 
-		Exceptional.of(this::getPropertyMap).ifException(System.out::println);
-
 		mapper.map(keyEntity, object);
 
 		return object;
