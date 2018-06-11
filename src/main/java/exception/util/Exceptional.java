@@ -21,13 +21,18 @@ import java.util.function.Supplier;
  * <pre>
  *      <code>
  *
- *      Object value = Exceptional.of(() -&gt Class.methodReference).filterValue();
+ *      Exceptional&lt;Class&gt; exceptional = Exceptional.of(Class::methodReference);
  *
- *      Exceptional.of(Class::methodReference).ifPresent(System.out::println);
+ *      exceptional.ifPresent(AnotherClass::method)
+ *                 .orElseDo(object, obj -&gt; action(obj));
+ *
+ *      Exceptional.of(Class::methodReference)
+ *                 .ifPresent(System.out::println);
  *
  *      Exceptional.of(() -&gt; IOUtils.readBytes(inputStream)).getOrElse(new byte[0]);
  *
- *      Exceptional&lt;String&gt; exceptionalString = Exceptional.of(() -&gt Class.methodReference);
+ *      Exceptional&lt;OtherClass&gt; exceptional = Exceptional.of(() -&gt Class.staticMethod(arg));
+ *      exceptional.rethrowRunTime();
  *
  *      </code>
  * </pre>
@@ -284,6 +289,7 @@ public class Exceptional<T> {
 
 	/**
 	 * Will return the {@code value}, whether it is {@code null} or not
+	 *
 	 * @return {@link #value}
 	 */
 	public T filterValue() {
@@ -292,6 +298,7 @@ public class Exceptional<T> {
 
 	/**
 	 * Will return the {@code exception}, whether it is {@code null} or not
+	 *
 	 * @return {@link #exception}
 	 */
 	public Exception filterException() {
@@ -331,11 +338,12 @@ public class Exceptional<T> {
 
 
 	/**
-	 * If no exception is thrown and a value is present, performs the given action with the value,
-	 * otherwise does nothing.
+	 * Will perform the given action with the value and then will return itself if no exception is thrown
+	 * and the value is non-{@code null}, otherwise will only return itself.
 	 *
-	 * @param action the action to be performed, if a value is present and no exception was thrown
-	 * @return TODO: This
+	 * @param action the action to be performed, if the value is non-{@code null} and no exception was thrown
+	 * @return Will perform the given action with the value and then will return itself if no exception is thrown
+	 * and the value is non-{@code null}, otherwise will only return itself.
 	 * @throws NullPointerException if value is present and the given action is
 	 *                              {@code null}
 	 */
@@ -343,6 +351,20 @@ public class Exceptional<T> {
 		if (exception == null && value != null)
 			action.accept(value);
 		return this;
+	}
+
+	/**
+	 * Returns itself if no exception is thrown and the value is non-{@code null}, otherwise
+	 * returns an empty {@link Exceptional}
+	 *
+	 * @return Returns itself if no exception is thrown and the value is non-{@code null}, otherwise
+	 * returns an empty {@link Exceptional}
+	 */
+	public Exceptional<T> ifPresent() {
+		if (exception == null && value != null) {
+			return this;
+		}
+		return empty();
 	}
 
 	/**
@@ -372,6 +394,7 @@ public class Exceptional<T> {
 
 	/**
 	 * If an {@link Exception} is present, will rethrow it as a {@link RuntimeException}
+	 *
 	 * @throws RuntimeException if an {@link Exception} is present
 	 */
 	public void rethrowRunTime() {
@@ -382,6 +405,7 @@ public class Exceptional<T> {
 
 	/**
 	 * If an {@link Exception} is present, will rethrow it as an {@link Exception}
+	 *
 	 * @throws Exception if an {@link Exception} is present
 	 */
 	public void rethrow() throws Exception {
