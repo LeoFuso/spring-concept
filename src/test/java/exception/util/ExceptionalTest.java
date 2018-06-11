@@ -202,6 +202,29 @@ public class ExceptionalTest {
 				.orElseDo(result, res -> res.append("Value"));
 
 		assertEquals("Value", result.toString());
+
+	}
+
+	@Test
+	public void ifPresentReturn() {
+
+		Exceptional<String> exceptional = Exceptional.ofNullable(this::getValue);
+		String actual = exceptional
+				.ifPresent()
+				.orElse("Other value");
+
+		assertEquals("Value", actual);
+	}
+
+	@Test
+	public void ifNotPresentReturn() {
+
+		Exceptional<String> exceptional = Exceptional.ofNullable(this::getNullValue);
+		String actual = exceptional
+				.ifPresent()
+				.orElse(this::getValue);
+
+		assertEquals("Value", actual);
 	}
 
 	private String exceptionThrower() throws Exception {
