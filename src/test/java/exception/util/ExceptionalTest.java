@@ -70,7 +70,7 @@ public class ExceptionalTest {
 	}
 
 	@Test
-	public void testIfWillThrowWrongException(){
+	public void testIfWillThrowWrongException() {
 
 		Exceptional<String> exceptional = Exceptional.of(this::exceptionThrower);
 		assertTrue(exceptional.isExceptionPresent());
@@ -214,6 +214,39 @@ public class ExceptionalTest {
 
 	}
 
+
+	/*
+	 * Or return something from that action
+	 */
+	@Test
+	public void nullableOrElseDoReturnType() {
+
+		Exceptional<String> exceptional = Exceptional.ofNullable(this::exceptionThrower);
+
+		String result = exceptional
+				.ifPresent()
+				.orElseDo(new StringBuilder(), sb -> sb.append("Value")).toString();
+
+		assertEquals("Value", result);
+	}
+
+	@Test
+	public void OrElseDoReturnTypeChange() {
+
+
+		Exceptional<String> exceptional = Exceptional.ofNullable(this::getNullValue);
+
+		StringBuilder builder = new StringBuilder();
+
+		Integer result = 5;
+		result = exceptional
+				.ifPresent(builder::append)
+				.orElseDo(result, integer -> integer = Integer.valueOf("2"));
+
+		assertEquals(Integer.valueOf("2"), result);
+		assertEquals("", builder.toString());
+	}
+
 	@Test
 	public void ifPresentReturn() {
 
@@ -250,6 +283,14 @@ public class ExceptionalTest {
 
 	private String getValue() {
 		return "Value";
+	}
+
+	private Integer getIntegerValue(){
+		return 12;
+	}
+
+	private Integer getIntegerNullValue(){
+		return null;
 	}
 
 }

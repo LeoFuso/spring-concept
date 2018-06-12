@@ -256,16 +256,31 @@ public class Exceptional<T> {
 	}
 
 	/**
-	 * If an {@link Exception} is thrown or the {@code value} is {@code null}, performs the given
-	 * {@code action} on {@code object} passed as parameter, otherwise does nothing.
+	 * If an {@link Exception} is thrown or the {@code value} is {@code null}, performs the {@code action}
+	 * on the {@code object} and returns the {@code object}, otherwise just returns the {@code object}.
+	 * <p>
+	 * Example:
+	 * </p>
+	 *
+	 * <pre>
+	 *       <code>
+	 *              Integer otherResult = 0;
+	 *              String result = Exceptional.of(Class::someIntegerReturnMethod)
+	 *                                         .ifPresent()
+	 *                                         .orElseDo(new StringBuilder, str -&gt str.append("Something")).toString();
+	 *       </code>
+	 * </pre>
 	 *
 	 * @param object target of a given {@code action} to be performed
 	 * @param action the {@code action} to be performed on {@code object}, if no {@code value} is present
 	 *               and an {@link Exception} is thrown
 	 * @param <O>    type of {@code object} passed as parameter
 	 * @throws NullPointerException if given {@code action} or {@code object} is {@code null}
+	 * @apiNote Note that the presence of this method will change the  return {@code type} of the
+	 * {@link Exceptional} chain, use it only after all the operations needed in the
+	 * {@link Exceptional#value} is performed
 	 */
-	//TODO: Javadoc return
+	//TODO: Verify method usage
 	public <O> O orElseDo(O object, Consumer<O> action) {
 		if (value == null) {
 			action.accept(object);
