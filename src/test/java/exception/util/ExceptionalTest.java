@@ -70,13 +70,22 @@ public class ExceptionalTest {
 	}
 
 	@Test
+	public void testIfWillThrowWrongException(){
+
+		Exceptional<String> exceptional = Exceptional.of(this::exceptionThrower);
+		assertTrue(exceptional.isExceptionPresent());
+		exceptional.rethrowRunTime();
+
+	}
+
+	@Test
 	public void testIfOneTypeOfExceptionIsNotPresent() {
 
 		Exceptional<String> exceptional = Exceptional.of(this::runtimeExceptionThrower);
 
 		StringBuilder result = new StringBuilder();
 
-		exceptional.ifException(IOException.class, ex -> result.append(
+		exceptional.ifExceptionIs(IOException.class, ex -> result.append(
 				ex.getMessage()));
 
 		assertEquals("", result.toString());
@@ -90,7 +99,7 @@ public class ExceptionalTest {
 
 		StringBuilder result = new StringBuilder();
 
-		exceptional.ifException(RuntimeException.class, ex -> result.append(
+		exceptional.ifExceptionIs(RuntimeException.class, ex -> result.append(
 				ex.getMessage()
 		));
 
@@ -232,7 +241,7 @@ public class ExceptionalTest {
 	}
 
 	private String runtimeExceptionThrower() {
-		throw new RuntimeException("message");
+		throw new UnsupportedOperationException("message");
 	}
 
 	private String getNullValue() {

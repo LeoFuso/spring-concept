@@ -2,7 +2,6 @@ package exception.util;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -118,9 +117,8 @@ public class Exceptional<T> {
 	/**
 	 * Constructs an empty instance.
 	 *
-	 * @implNote Generally only one empty instance, {@link Optional#EMPTY},
+	 * @implNote Generally only one empty instance, {@link Exceptional#EMPTY},
 	 * should exist per VM.
-	 * I don't know if this is valid for the {@link Exceptional#EMPTY} too.
 	 */
 	private Exceptional() {
 		this.value = null;
@@ -210,20 +208,6 @@ public class Exceptional<T> {
 	}
 
 	/**
-	 * Returns an {@link Exceptional} describing the given non-{@code null}
-	 * exception.
-	 *
-	 * @param exception the exception to describe, which must be non-{@code null}
-	 * @param <T>       the type of the value
-	 * @return an {@link Exceptional} with the exception present
-	 * @throws NullPointerException if value is {@code null}
-	 */
-	@Deprecated(forRemoval = true)
-	private static <T> Exceptional<T> ofNullable(Exception exception) {
-		return of(exception);
-	}
-
-	/**
 	 * If an exception is present, throws {@link RuntimeException}, otherwise
 	 * checks if the value is present.
 	 * If a value is present, returns the value, otherwise throws
@@ -281,10 +265,12 @@ public class Exceptional<T> {
 	 * @param <O>    type of {@code object} passed as parameter
 	 * @throws NullPointerException if given {@code action} or {@code object} is {@code null}
 	 */
-	public <O> void orElseDo(O object, Consumer<O> action) {
+	//TODO: Javadoc return
+	public <O> O orElseDo(O object, Consumer<O> action) {
 		if (value == null) {
 			action.accept(object);
 		}
+		return object;
 	}
 
 	/**
@@ -348,8 +334,23 @@ public class Exceptional<T> {
 	 *                              {@code null}
 	 */
 	public Exceptional<T> ifPresent(Consumer<? super T> action) {
-		if (exception == null && value != null)
+		if (exception == null && value != null) {
 			action.accept(value);
+		}
+		return this;
+	}
+
+	/**
+	 * Invokes action function if there were any exception.
+	 *
+	 * @param action a action function
+	 * @return an {@code Exceptional}
+	 */
+	//TODO: Javadoc and test methods
+	public Exceptional<T> ifException(Consumer<? super Exception> action) {
+		if (exception != null) {
+			action.accept(exception);
+		}
 		return this;
 	}
 
@@ -367,6 +368,8 @@ public class Exceptional<T> {
 		return empty();
 	}
 
+	//TODO: Javadoc and test methods
+
 	/**
 	 * If no exception is thrown and a value is present, performs the given action with the value,
 	 * otherwise performs the given empty-based action.
@@ -378,6 +381,7 @@ public class Exceptional<T> {
 	 *                              is {@code null}, or no value is present and the given empty-based
 	 *                              action is {@code null}.
 	 */
+	//TODO: Javadoc and utility
 	public void ifPresentOrElse(Consumer<? super T> action, Runnable emptyAction) {
 		if (exception == null && value != null)
 			action.accept(value);
@@ -392,14 +396,41 @@ public class Exceptional<T> {
 		 */
 	}
 
+	public Exceptional<T> ifException() {
+		if (exception != null) {
+			return this;
+		}
+		return empty();
+	}
+
 	/**
-	 * If an {@link Exception} is present, will rethrow it as a {@link RuntimeException}
+	 * Invokes consumer function if {@link Exception} matches {@code exception} class
+	 * reference passed as parameter
+	 *
+	 * @param <E>        the type of exception
+	 * @param targetType the class of an {@code exception}  to be compared
+	 * @param consumer   a consumer function
+	 * @return an {@code Exceptional}
+	 */
+	@SuppressWarnings("unchecked")
+	public <E extends Exception> Exceptional<T> ifExceptionIs(Class<E> targetType, Consumer<? super E> consumer) {
+		if ((exception != null) &&
+				(targetType.isAssignableFrom(exception.getClass()))) {
+			consumer.accept((E) exception);
+		}
+		return this;
+	}
+
+	/**
+	 * If an {@link Exception} is present, will try to rethrow it as a {@link RuntimeException}
 	 *
 	 * @throws RuntimeException if an {@link Exception} is present
 	 */
 	public void rethrowRunTime() {
 		if (exception != null) {
-			throw (RuntimeException) exception;
+			try {
+				throw (RuntimeException) exception;
+			} catch (ClassCastException ignored) { /*empty */}
 		}
 	}
 
@@ -414,40 +445,31 @@ public class Exceptional<T> {
 		}
 	}
 
-	public void ifException(Consumer<? super Exception> action) {
-		if (exception != null)
-			action.accept(exception);
-	}
-
-	public void ifException(Class<? extends Exception> targetType,
-	                        Consumer<? super Exception> consumer) {
-
-		if (exception != null && targetType.isAssignableFrom(exception.getClass()))
-			consumer.accept(exception);
-	}
-
 	@Override
 	public boolean equals(Object obj) {
-
-		if (this == obj)
+		if (this == obj) {
 			return true;
+		}
 
-		if (!(obj instanceof Exceptional))
+		if (!(obj instanceof Exceptional)) {
 			return false;
+		}
 
 		Exceptional<?> other = (Exceptional<?>) obj;
-		return Objects.equals(value, other.value);
+		return Objects.equals(value, other.value) &&
+				Objects.equals(exception, other.exception);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(value);
+		return Objects.hash(value, exception);
 	}
 
 	@Override
 	public String toString() {
-		return exception == null ? String.format("Exceptional[%s]", value)
-				: String.format("Exceptional[%s]", exception);
+		return exception == null
+				? String.format("Exceptional value %s", value)
+				: String.format("Exceptional exception %s", exception);
 	}
 
 }
