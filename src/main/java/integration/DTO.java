@@ -1,6 +1,6 @@
 package integration;
 
-import exception.util.Exceptional;
+import exceptional.Exceptional;
 import org.apache.commons.lang3.Validate;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

@@ -1,4 +1,4 @@
-package exception.util;
+package exceptional;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;

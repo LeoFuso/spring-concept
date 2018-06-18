@@ -1,4 +1,4 @@
-package exception.util;
+package exceptional;
 
 import org.junit.Test;
 
@@ -285,11 +285,11 @@ public class ExceptionalTest {
 		return "Value";
 	}
 
-	private Integer getIntegerValue(){
+	private Integer getIntegerValue() {
 		return 12;
 	}
 
-	private Integer getIntegerNullValue(){
+	private Integer getIntegerNullValue() {
 		return null;
 	}
 
