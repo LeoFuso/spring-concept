@@ -92,18 +92,4 @@ public class DTOTest {
 		assertNull(onlyBobNameDTO);
 
 	}
-
-	@Test
-	public void testModelMapper() {
-
-		final ModelMapper modelMapper = new ModelMapper();
-
-		TypeMap<Person, PersonNameDTO> typeMappings;
-		typeMappings = modelMapper.getTypeMap(Person.class, PersonNameDTO.class);
-
-		typeMappings.getMappings().forEach(System.out::println);
-
-
-	}
-
 }
