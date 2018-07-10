@@ -4,6 +4,7 @@ import exceptional.Exceptional;
 import org.apache.commons.lang3.Validate;
 import org.modelmapper.ModelMapper;
 import util.stream.CollectOne;
+
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.*;
@@ -53,17 +54,25 @@ public abstract class DTO<T, D extends DTO> {
 
 		Class<D> classReference = this.getDataTransferObjectClass();
 
+		/* invoke new() on classReference */
 		D object = DTO.getObjectReference(classReference);
 
 		Exceptional<Stream<D>> streamExceptional = Exceptional.of(() -> this.getCustomMapping(keyEntity));
 
-		if(!streamExceptional.isPresent()){
-			mapper.map(keyEntity, object);
-			return object;
+		/* No custom mapping was defined */
+		streamExceptional.ifException(e -> mapper.map(keyEntity, object));
+
+		/* if no exception was thrown */
+		if (streamExceptional.isPresent()) {
+
+			/* Finally */
+			return streamExceptional.get()
+					.collect(CollectOne.singletonCollector());
+
 		}
 
-		return streamExceptional.get()
-				.collect(CollectOne.singletonCollector());
+		/* Finally */
+		return object;
 	}
 
 	public Stream<D> getCustomMapping(T keyEntity) { throw new UnsupportedOperationException(); }
