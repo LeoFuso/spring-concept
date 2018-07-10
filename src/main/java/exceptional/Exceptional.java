@@ -1,5 +1,6 @@
 package exceptional;
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -434,6 +435,17 @@ public class Exceptional<T> {
 			consumer.accept((E) exception);
 		}
 		return this;
+	}
+
+	/**
+	 * Returns whether or not the exception thrown has the same type of {@code targetType}
+	 *
+	 * @param <E>        the type of exception
+	 * @param targetType the class of an {@code exception}  to be compared
+	 * @return whether the exception thrown has the same type of {@code targetType} or not
+	 */
+	public <E extends Exception> boolean isException(Class<E> targetType) {
+		return ((exception != null) && (targetType.isAssignableFrom(exception.getClass())));
 	}
 
 	/**
