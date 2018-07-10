@@ -54,7 +54,7 @@ public interface CollectOne {
 				Collectors.toList(),
 				list -> {
 					if (list.size() == 0)
-						throw new IllegalStateException();
+						throw new IllegalStateException("The list is empty");
 					return list.get(0);
 				}
 		);
