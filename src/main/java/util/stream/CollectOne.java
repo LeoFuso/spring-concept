@@ -28,6 +28,18 @@ public interface CollectOne {
 	}
 
 	/**
+	 * @param predicate a {@code predicate} to be applied to the input elements
+	 * @param <T>       the result type of the {@code collector}
+	 * @return Returns the single element resulting of the {@code predicate} applied to the {@link java.util.Collection}
+	 * @throws IllegalStateException if the resulting {@link java.util.Collection} has more than one element
+	 * @apiNote It encapsulates the {@link Collectors#filtering(Predicate, Collector)} with the {@link #singletonCollector()}
+	 * behavior
+	 */
+	static <T> Collector<T, ?, T> find(Predicate<? super T> predicate) {
+		return Collectors.filtering(predicate, CollectOne.singletonCollector());
+	}
+
+	/**
 	 * Returns the first element of a {@link java.util.Collection}, and will throw an {@link IllegalStateException}
 	 * if the {@link java.util.Collection} is empty
 	 *
@@ -46,17 +58,5 @@ public interface CollectOne {
 					return list.get(0);
 				}
 		);
-	}
-
-	/**
-	 * @param predicate a {@code predicate} to be applied to the input elements
-	 * @param <T>       the result type of the {@code collector}
-	 * @return Returns the single element resulting of the {@code predicate} applied to the {@link java.util.Collection}
-	 * @throws IllegalStateException if the resulting {@link java.util.Collection} has more than one element
-	 * @apiNote It encapsulates the {@link Collectors#filtering(Predicate, Collector)} with the {@link #singletonCollector()}
-	 * behavior
-	 */
-	static <T> Collector<T, ?, T> find(Predicate<? super T> predicate) {
-		return Collectors.filtering(predicate, CollectOne.singletonCollector());
 	}
 }

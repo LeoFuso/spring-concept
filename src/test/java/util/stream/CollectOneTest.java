@@ -33,8 +33,6 @@ public class CollectOneTest {
 
 		Integer toCollect = (Integer) objects.stream()
 				.collect(CollectOne.singletonCollector());
-
-		Assert.assertEquals(5, toCollect.longValue());
 	}
 
 	@Test
@@ -48,7 +46,7 @@ public class CollectOneTest {
 
 		Integer toCollect = (Integer) objects.stream()
 				.collect(Collectors.filtering(o -> (Integer) o == 5,
-								CollectOne.singletonCollector()));
+						CollectOne.singletonCollector()));
 
 		Assert.assertEquals(5, toCollect.longValue());
 	}
