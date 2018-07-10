@@ -6,6 +6,8 @@ import org.modelmapper.Condition;
 import org.modelmapper.Converter;
 import org.modelmapper.PropertyMap;
 
+import java.util.stream.Stream;
+
 public class OnlyBobPersonNameDTO extends DTO<Person, OnlyBobPersonNameDTO> {
 
 	private String fullName;
@@ -16,44 +18,22 @@ public class OnlyBobPersonNameDTO extends DTO<Person, OnlyBobPersonNameDTO> {
 	}
 
 	@Override
-	public PropertyMap<Person, OnlyBobPersonNameDTO> getPropertyMap() {
+	public Stream<OnlyBobPersonNameDTO> getCustomMapping(Person keyEntity) {
 
 		final String name = "Bob";
 
-		/*
-		 THIS IS A DISASTER
-		 I HATE MODEL MAPPER
-		 THIS DOES NOT WORK AND I DON'T KNOW WHY
-		 I'M VERY SAD RN
-		 */
+		return Stream.of(keyEntity)
+				.map(person -> {
 
-		//Condition<Person, OnlyBobPersonNameDTO> isBob = context -> context.getSource().getFirstName().equals(name);
-		Condition<?, ?> isBob = (Condition<Person, OnlyBobPersonNameDTO>) context -> context.getSource().getFirstName().equals(name);
+					if(!keyEntity.getFirstName().equals(name))
+						return null;
 
-		return new PropertyMap<>() {
-			@Override
-			protected void configure() {
-				when(isBob).map().setFullName(source.getFullName());
-				when(isBob).map().setShortName(source.getShortName());
-			}
-		};
-	}
+					OnlyBobPersonNameDTO dto = new OnlyBobPersonNameDTO();
+					dto.setFullName(person.getFullName());
+					dto.setShortName(person.getShortName());
 
-	@Override
-	protected Converter<Person, OnlyBobPersonNameDTO> getConverter() {
-
-		/* THIS DOES NOT WORK EITHER */
-		return context -> {
-			Person source = context.getSource();
-			OnlyBobPersonNameDTO destination = context.getDestination();
-
-			if (source.getFirstName().equals("Bob")) {
-				destination.setFullName(source.getFullName());
-				destination.setShortName(source.getShortName());
-				return destination;
-			} else
-				return null;
-		};
+					return dto;
+				});
 	}
 
 	public OnlyBobPersonNameDTO(String fullName, String shortName) {

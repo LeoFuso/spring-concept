@@ -2,14 +2,16 @@ package integration;
 
 import exceptional.Exceptional;
 import org.apache.commons.lang3.Validate;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
-
+import util.stream.CollectOne;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -53,21 +55,18 @@ public abstract class DTO<T, D extends DTO> {
 
 		D object = DTO.getObjectReference(classReference);
 
-		Exceptional.of(this::getPropertyMap)
-				.ifPresent(mapper::addMappings);
+		Exceptional<Stream<D>> streamExceptional = Exceptional.of(() -> this.getCustomMapping(keyEntity));
 
-		mapper.map(keyEntity, object);
+		if(!streamExceptional.isPresent()){
+			mapper.map(keyEntity, object);
+			return object;
+		}
 
-		return object;
+		return streamExceptional.get()
+				.collect(CollectOne.singletonCollector());
 	}
 
-	public PropertyMap<T, D> getPropertyMap() {
-		throw new UnsupportedOperationException();
-	}
-
-	protected Converter<T, D> getConverter() {
-		throw new UnsupportedOperationException();
-	}
+	public Stream<D> getCustomMapping(T keyEntity) { throw new UnsupportedOperationException(); }
 
 	/**
 	 * <p>
