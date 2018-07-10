@@ -17,6 +17,11 @@ public class OnlyBobPersonNameDTO extends DTO<Person, OnlyBobPersonNameDTO> {
 		super();
 	}
 
+	public OnlyBobPersonNameDTO(String fullName, String shortName) {
+		this.fullName = fullName;
+		this.shortName = shortName;
+	}
+
 	@Override
 	public Stream<OnlyBobPersonNameDTO> getCustomMapping(Person keyEntity) {
 
@@ -34,11 +39,6 @@ public class OnlyBobPersonNameDTO extends DTO<Person, OnlyBobPersonNameDTO> {
 
 					return dto;
 				});
-	}
-
-	public OnlyBobPersonNameDTO(String fullName, String shortName) {
-		this.fullName = fullName;
-		this.shortName = shortName;
 	}
 
 	public String getFullName() {
